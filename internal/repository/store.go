@@ -11,7 +11,9 @@ type database interface {
 	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
-type Store interface{}
+type Store interface {
+	FlashcardSet() FlashcardSetRepository
+}
 
 type store struct {
 	conn *sql.DB
@@ -23,4 +25,8 @@ func NewStore(db *sql.DB) Store {
 		conn: db,
 		db:   db,
 	}
+}
+
+func (s *store) FlashcardSet() FlashcardSetRepository {
+	return NewFlashcardSetRepository(s.db)
 }
