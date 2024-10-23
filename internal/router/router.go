@@ -20,6 +20,7 @@ func Init(opts *handler.HandlerOpts) http.Handler {
 	authMiddleware := middleware.NewAuthMiddleware()
 
 	r.GET("/sets", authMiddleware.IsAuthenticated(), opts.UserHandler.ListSets)
+	r.GET("/sets/:id", authMiddleware.IsAuthenticated(), opts.UserHandler.ListCards)
 
 	return r
 

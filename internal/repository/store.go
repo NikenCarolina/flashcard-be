@@ -13,6 +13,7 @@ type database interface {
 
 type Store interface {
 	FlashcardSet() FlashcardSetRepository
+	Flashcard() FlashcardRepository
 }
 
 type store struct {
@@ -29,4 +30,8 @@ func NewStore(db *sql.DB) Store {
 
 func (s *store) FlashcardSet() FlashcardSetRepository {
 	return NewFlashcardSetRepository(s.db)
+}
+
+func (s *store) Flashcard() FlashcardRepository {
+	return NewFlashcardRepository(s.db)
 }

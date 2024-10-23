@@ -4,6 +4,7 @@ import "net/http"
 
 var (
 	ErrInternalServerError = newError(http.StatusInternalServerError, "Internal Server Error")
+	ErrNotFound            = newError(http.StatusNotFound, "Not Found")
 )
 
 type Error struct {
