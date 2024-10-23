@@ -20,3 +20,21 @@ func (h *UserHandler) ListSets(ctx *gin.Context) {
 		Data: data,
 	})
 }
+
+func (h *UserHandler) ListCards(ctx *gin.Context) {
+	var uri dto.FlashcardSetUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	data, err := h.useCase.GetCards(ctx, ctx.GetInt(appconst.KeyUserID), uri.FlashcardSetID)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Data: data,
+	})
+}

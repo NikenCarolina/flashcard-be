@@ -3,7 +3,7 @@ package model
 import "github.com/NikenCarolina/flashcard-be/internal/dto"
 
 type FlashcardSet struct {
-	FlashcardSetID int64
+	FlashcardSetID int
 	Title          string
 	Description    string
 }

@@ -8,7 +8,8 @@ import (
 )
 
 type FlashcardSetRepository interface {
-	GetSets(ctx context.Context, userID int) ([]model.FlashcardSet, error)
+	GetAll(ctx context.Context, userID int) ([]model.FlashcardSet, error)
+	CheckExists(ctx context.Context, userID, setID int) (bool, error)
 }
 
 type flashcardSetRepository struct {
@@ -19,14 +20,15 @@ func NewFlashcardSetRepository(db database) FlashcardSetRepository {
 	return &flashcardSetRepository{db}
 }
 
-func (r *flashcardSetRepository) GetSets(ctx context.Context, userID int) ([]model.FlashcardSet, error) {
+func (r *flashcardSetRepository) GetAll(ctx context.Context, userID int) ([]model.FlashcardSet, error) {
 	flashcardSets := []model.FlashcardSet{}
 	query := `
 		SELECT 
 			"flashcard_set_id", 
 			"title", 
 			"description" 
-		FROM "flashcard_sets" WHERE user_id = $1`
+		FROM "flashcard_sets" 
+		WHERE "user_id" = $1`
 
 	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
@@ -51,4 +53,21 @@ func (r *flashcardSetRepository) GetSets(ctx context.Context, userID int) ([]mod
 	}
 
 	return flashcardSets, nil
+}
+
+func (r *flashcardSetRepository) CheckExists(ctx context.Context, userID, setID int) (bool, error) {
+	query := `
+		SELECT EXISTS (
+			SELECT 1
+			FROM flashcard_sets
+			WHERE user_id = $1 AND flashcard_set_id = $2
+		)
+	`
+
+	var exists bool
+	if err := r.db.QueryRowContext(ctx, query, userID, setID).Scan(&exists); err != nil {
+		return false, apperror.ErrInternalServerError
+	}
+
+	return exists, nil
 }
