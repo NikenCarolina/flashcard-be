@@ -9,6 +9,7 @@ import (
 
 type UserFlashcardUseCase interface {
 	GetSets(ctx context.Context, userID int) ([]dto.FlashcardSet, error)
+	GetSetById(ctx context.Context, userID int, setID int) (*dto.FlashcardSet, error)
 	GetCards(ctx context.Context, setID int, userID int) ([]dto.Flashcard, error)
 }
 
@@ -25,6 +26,15 @@ func (u *userUseCase) GetSets(ctx context.Context, userID int) ([]dto.FlashcardS
 	}
 
 	return res, nil
+}
+
+func (u *userUseCase) GetSetById(ctx context.Context, userID int, setID int) (*dto.FlashcardSet, error) {
+	flashcardSetRepo := u.store.FlashcardSet()
+	flashcardSets, err := flashcardSetRepo.GetById(ctx, userID, setID)
+	if err != nil {
+		return nil, err
+	}
+	return flashcardSets.ToDto(), nil
 }
 
 func (u *userUseCase) GetCards(ctx context.Context, userID int, setID int) ([]dto.Flashcard, error) {

@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/NikenCarolina/flashcard-be/internal/apperror"
 	"github.com/NikenCarolina/flashcard-be/internal/model"
@@ -9,6 +11,7 @@ import (
 
 type FlashcardSetRepository interface {
 	GetAll(ctx context.Context, userID int) ([]model.FlashcardSet, error)
+	GetById(ctx context.Context, userID int, setID int) (*model.FlashcardSet, error)
 	CheckExists(ctx context.Context, userID, setID int) (bool, error)
 }
 
@@ -70,4 +73,26 @@ func (r *flashcardSetRepository) CheckExists(ctx context.Context, userID, setID 
 	}
 
 	return exists, nil
+}
+
+func (r *flashcardSetRepository) GetById(ctx context.Context, userID, setID int) (*model.FlashcardSet, error) {
+	query := `
+		SELECT 
+			"flashcard_set_id", 
+			"title", 
+			"description" 
+		FROM "flashcard_sets"
+		WHERE "user_id" = $1 AND "flashcard_set_id" = $2
+	`
+	flashcardSet := &model.FlashcardSet{}
+	dest := []interface{}{&flashcardSet.FlashcardSetID, &flashcardSet.Title, &flashcardSet.Description}
+
+	if err := r.db.QueryRowContext(ctx, query, userID, setID).Scan(dest...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperror.ErrNotFound
+		}
+		return nil, apperror.ErrInternalServerError
+	}
+
+	return flashcardSet, nil
 }
