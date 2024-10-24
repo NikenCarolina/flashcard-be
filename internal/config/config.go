@@ -4,14 +4,17 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	App      *AppConfig
 	Database *DatabaseConfig
+	Cors     *cors.Config
 }
 
 type AppConfig struct {
@@ -35,6 +38,7 @@ func InitConfig() *Config {
 	return &Config{
 		App:      InitAppConfig(),
 		Database: InitDatabaseConfig(),
+		Cors:     InitCorsConfig(),
 	}
 }
 
@@ -62,5 +66,12 @@ func InitDatabaseConfig() *DatabaseConfig {
 		Password: os.Getenv("DATABASE_PASSWORD"),
 		Name:     os.Getenv("DATABASE_NAME"),
 		Port:     uint16(port),
+	}
+}
+
+func InitCorsConfig() *cors.Config {
+	return &cors.Config{
+		AllowOrigins: []string{os.Getenv("FRONTEND_URL")},
+		AllowMethods: strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), " "),
 	}
 }

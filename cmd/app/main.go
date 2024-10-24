@@ -13,7 +13,7 @@ func main() {
 	db := postgres.Init(config)
 	defer db.Close()
 	handler := handler.Init(db, config)
-	router := router.Init(handler)
+	router := router.Init(handler, config)
 	server := server.NewServer(config, router)
 	server.Run()
 }
