@@ -23,8 +23,12 @@ func Init(opts *handler.HandlerOpts, config *config.Config) http.Handler {
 	authMiddleware := middleware.NewAuthMiddleware()
 
 	r.GET("/sets", authMiddleware.IsAuthenticated(), opts.UserHandler.ListSets)
-	r.GET("/sets/:id", authMiddleware.IsAuthenticated(), opts.UserHandler.GetSetById)
-	r.GET("/sets/:id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.ListCards)
+	r.GET("/sets/:set_id", authMiddleware.IsAuthenticated(), opts.UserHandler.GetSetById)
+	r.GET("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.ListCards)
+	r.POST("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.CreateCard)
+	r.PUT("/sets/:set_id/cards/:card_id", authMiddleware.IsAuthenticated(), opts.UserHandler.UpdateCard)
+	r.PUT("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.BulkUpdateCard)
+	r.DELETE("/sets/:set_id/cards/:card_id", authMiddleware.IsAuthenticated(), opts.UserHandler.DeleteCard)
 
 	return r
 }

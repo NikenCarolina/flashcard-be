@@ -1,7 +1,7 @@
 package dto
 
 type FlashcardSetUri struct {
-	FlashcardSetID int `uri:"id" binding:"required"`
+	FlashcardSetID int `uri:"set_id" binding:"required"`
 }
 
 type FlashcardSet struct {

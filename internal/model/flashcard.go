@@ -17,3 +17,10 @@ func (m *Flashcard) ToDto() *dto.Flashcard {
 		Definition:     m.Definition,
 	}
 }
+
+func (m *Flashcard) LoadFromDto(f dto.Flashcard) {
+	m.FlashcardSetID = f.FlashcardSetID
+	m.FlashcardID = f.FlashcardID
+	m.Term = f.Term
+	m.Definition = f.Definition
+}
