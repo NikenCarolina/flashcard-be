@@ -6,6 +6,7 @@ import (
 	"github.com/NikenCarolina/flashcard-be/internal/apperror"
 	"github.com/NikenCarolina/flashcard-be/internal/dto"
 	"github.com/NikenCarolina/flashcard-be/internal/model"
+	"github.com/NikenCarolina/flashcard-be/internal/repository"
 )
 
 type UserFlashcardUseCase interface {
@@ -67,22 +68,41 @@ func (u *userUseCase) GetCards(ctx context.Context, userID int, setID int) ([]dt
 }
 
 func (u *userUseCase) CreateCard(ctx context.Context, userID int, setID int) (*dto.Flashcard, error) {
-	flashcardSetRepo := u.store.FlashcardSet()
-	exists, err := flashcardSetRepo.CheckExists(ctx, userID, setID)
+	res, err := u.store.Atomic(ctx, func(s repository.Store) (any, error) {
+		flashcardSetRepo := u.store.FlashcardSet()
+		exists, err := flashcardSetRepo.CheckExists(ctx, userID, setID)
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			return nil, apperror.ErrNotFound
+		}
+
+		flashcardRepo := u.store.Flashcard()
+		res, err := flashcardRepo.Create(ctx, setID)
+		if err != nil {
+			return nil, err
+		}
+
+		progressRepo := u.store.FlashcardProgress()
+		err = progressRepo.Create(ctx,
+			setID,
+			res.FlashcardID,
+			u.flashcardConfig.RepetitionNumber,
+			u.flashcardConfig.EasinessFactor,
+			u.flashcardConfig.Interval,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return res.ToDto(), nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	if !exists {
-		return nil, apperror.ErrNotFound
-	}
+	card := res.(*dto.Flashcard)
 
-	flashcardRepo := u.store.Flashcard()
-	res, err := flashcardRepo.Create(ctx, setID)
-	if err != nil {
-		return nil, err
-	}
-
-	return res.ToDto(), nil
+	return card, nil
 }
 
 func (u *userUseCase) UpdateCard(ctx context.Context, userID int, req *dto.Flashcard) error {

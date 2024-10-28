@@ -8,6 +8,7 @@ import (
 )
 
 type FlashcardRepository interface {
+	GetByCardId(ctx context.Context, cardID int) (*model.Flashcard, error)
 	GetBySetId(ctx context.Context, setID int) ([]model.Flashcard, error)
 	Create(ctx context.Context, setID int) (*model.Flashcard, error)
 	Update(ctx context.Context, flashcard model.Flashcard) error
@@ -59,6 +60,31 @@ func (r *flashcardRepository) GetBySetId(ctx context.Context, setID int) ([]mode
 	}
 
 	return flashcards, nil
+}
+
+func (r *flashcardRepository) GetByCardId(ctx context.Context, cardID int) (*model.Flashcard, error) {
+	query := `
+		SELECT 
+			"flashcard_id", 
+			"flashcard_set_id", 
+			"term", 
+			"definition"
+		FROM flashcards
+		WHERE "flashcard_id" = $1 
+	`
+
+	var flashcard model.Flashcard
+	err := r.db.QueryRowContext(ctx, query, cardID).Scan(
+		&flashcard.FlashcardID,
+		&flashcard.FlashcardSetID,
+		&flashcard.Term,
+		&flashcard.Definition,
+	)
+	if err != nil {
+		return nil, apperror.ErrInternalServerError
+	}
+
+	return &flashcard, nil
 }
 
 func (r *flashcardRepository) Create(ctx context.Context, setID int) (*model.Flashcard, error) {
