@@ -13,9 +13,12 @@ type UserFlashcardUseCase interface {
 	GetSets(ctx context.Context, userID int) ([]dto.FlashcardSet, error)
 	GetSetById(ctx context.Context, userID int, setID int) (*dto.FlashcardSet, error)
 	GetCards(ctx context.Context, setID int, userID int) ([]dto.Flashcard, error)
+	CreateSet(ctx context.Context, userID int) (*dto.FlashcardSet, error)
 	CreateCard(ctx context.Context, userID int, setID int) (*dto.Flashcard, error)
 	UpdateCard(ctx context.Context, userID int, req *dto.Flashcard) error
+	UpdateSet(ctx context.Context, userID int, req *dto.FlashcardSet) error
 	DeleteCard(ctx context.Context, userID, setID, cardID int) error
+	DeleteSet(ctx context.Context, userID, setID int) error
 }
 
 func (u *userUseCase) GetSets(ctx context.Context, userID int) ([]dto.FlashcardSet, error) {
@@ -65,6 +68,15 @@ func (u *userUseCase) GetCards(ctx context.Context, userID int, setID int) ([]dt
 	}
 
 	return res, nil
+}
+
+func (u *userUseCase) CreateSet(ctx context.Context, userID int) (*dto.FlashcardSet, error) {
+	flashcardSetRepo := u.store.FlashcardSet()
+	res, err := flashcardSetRepo.Create(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return res.ToDto(), nil
 }
 
 func (u *userUseCase) CreateCard(ctx context.Context, userID int, setID int) (*dto.Flashcard, error) {
@@ -126,6 +138,26 @@ func (u *userUseCase) UpdateCard(ctx context.Context, userID int, req *dto.Flash
 	return nil
 }
 
+func (u *userUseCase) UpdateSet(ctx context.Context, userID int, req *dto.FlashcardSet) error {
+	flashcardSetRepo := u.store.FlashcardSet()
+	exists, err := flashcardSetRepo.CheckExists(ctx, userID, int(req.FlashcardSetID))
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return apperror.ErrNotFound
+	}
+
+	var flashcard model.FlashcardSet
+	flashcard.LoadFromDto(*req)
+
+	if err = flashcardSetRepo.Update(ctx, userID, flashcard); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *userUseCase) DeleteCard(ctx context.Context, userID, setID, cardID int) error {
 	flashcardSetRepo := u.store.FlashcardSet()
 	exists, err := flashcardSetRepo.CheckExists(ctx, userID, setID)
@@ -141,5 +173,20 @@ func (u *userUseCase) DeleteCard(ctx context.Context, userID, setID, cardID int)
 		return err
 	}
 
+	return nil
+}
+
+func (u *userUseCase) DeleteSet(ctx context.Context, userID, setID int) error {
+	flashcardSetRepo := u.store.FlashcardSet()
+	exists, err := flashcardSetRepo.CheckExists(ctx, userID, setID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return apperror.ErrNotFound
+	}
+	if err = flashcardSetRepo.Delete(ctx, userID, setID); err != nil {
+		return err
+	}
 	return nil
 }

@@ -15,3 +15,9 @@ func (m *FlashcardSet) ToDto() *dto.FlashcardSet {
 		Description:    m.Description,
 	}
 }
+
+func (m *FlashcardSet) LoadFromDto(s dto.FlashcardSet) {
+	m.FlashcardSetID = s.FlashcardSetID
+	m.Title = s.Title
+	m.Description = s.Description
+}
