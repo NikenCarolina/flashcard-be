@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/NikenCarolina/flashcard-be/internal/apperror"
 	"github.com/NikenCarolina/flashcard-be/internal/model"
@@ -90,7 +89,6 @@ func (r *flashcardProgressRepository) GetBySetId(ctx context.Context, setID int,
 
 	rows, err := r.db.QueryContext(ctx, query, setID, limit)
 	if err != nil {
-		log.Println(err)
 		return nil, apperror.ErrInternalServerError
 	}
 	defer rows.Close()
@@ -106,14 +104,12 @@ func (r *flashcardProgressRepository) GetBySetId(ctx context.Context, setID int,
 			&flashcardProgress.LastReview,
 			&flashcardProgress.DueDate,
 		); err != nil {
-			log.Println(err)
 			return nil, apperror.ErrInternalServerError
 		}
 		flashcardProgresses = append(flashcardProgresses, flashcardProgress)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Println(err)
 		return nil, apperror.ErrInternalServerError
 	}
 
@@ -145,7 +141,6 @@ func (r *flashcardProgressRepository) GetById(ctx context.Context, cardID int) (
 		&flashcardProgress.LastReview,
 		&flashcardProgress.DueDate,
 	); err != nil {
-		log.Println(err)
 		return nil, apperror.ErrInternalServerError
 	}
 

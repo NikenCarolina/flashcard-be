@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 
 	"github.com/NikenCarolina/flashcard-be/internal/apperror"
 	"github.com/NikenCarolina/flashcard-be/internal/model"
@@ -120,7 +119,6 @@ func (r *flashcardSetRepository) Create(ctx context.Context, userID int) (*model
 		&res.Title,
 		&res.Description,
 	); err != nil {
-		log.Println(err)
 		return nil, apperror.ErrInternalServerError
 	}
 	return &res, nil

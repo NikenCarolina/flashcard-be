@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"log"
 	"math"
 
 	"github.com/NikenCarolina/flashcard-be/internal/apperror"
@@ -26,32 +25,26 @@ func (u *userUseCase) StartSession(ctx context.Context, userID, setID int) (*dto
 			return nil, apperror.ErrNotFound
 		}
 
-		log.Println("SessionRepo")
-
 		sessionRepo := s.Session()
 		session, err := sessionRepo.Create(ctx, userID, setID)
 		if err != nil {
 			return nil, err
 		}
 
-		log.Println("FlashcardProgress")
 		flashcardProgressRepo := s.FlashcardProgress()
 		flashcardProgresses, err := flashcardProgressRepo.GetBySetId(ctx, setID, 10)
 		if err != nil {
 			return nil, err
 		}
 
-		log.Println("SessionFlashcardRepo")
 		var sessionFlashcards []dto.SessionFlashcard
 		sessionCardRepo := s.SessionFlashcard()
 		cardRepo := s.Flashcard()
 		for _, progress := range flashcardProgresses {
-			log.Println("SessionFlashcardRepo")
 			err = sessionCardRepo.Create(ctx, session.SessionID, progress.FlashcardID)
 			if err != nil {
 				return nil, err
 			}
-			log.Println("CardRepo")
 			card, err := cardRepo.GetByCardId(ctx, int(progress.FlashcardID))
 			if err != nil {
 				return nil, err
