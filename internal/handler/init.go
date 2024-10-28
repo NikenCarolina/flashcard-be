@@ -14,7 +14,7 @@ type HandlerOpts struct {
 
 func Init(db *sql.DB, config *config.Config) *HandlerOpts {
 	store := repository.NewStore(db)
-	userUseCase := usecase.NewUserUseCase(store)
+	userUseCase := usecase.NewUserUseCase(store, *config.Flashcard)
 	return &HandlerOpts{
 		UserHandler: NewUserHandler(userUseCase),
 	}

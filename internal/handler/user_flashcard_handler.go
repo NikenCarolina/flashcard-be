@@ -92,8 +92,8 @@ func (h *UserHandler) UpdateCard(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	req.FlashcardID = int64(uri.FlashcardID)
-	req.FlashcardSetID = int64(uri.FlashcardSetID)
+	req.FlashcardID = uri.FlashcardID
+	req.FlashcardSetID = uri.FlashcardSetID
 
 	err := h.useCase.UpdateCard(ctx, ctx.GetInt(appconst.KeyUserID), &req)
 	if err != nil {
@@ -139,7 +139,7 @@ func (h *UserHandler) BulkUpdateCard(ctx *gin.Context) {
 
 	var flashcardResponses []dto.FlashcardUpdateResponse
 	for _, card := range flashcards {
-		card.FlashcardSetID = int64(uri.FlashcardSetID)
+		card.FlashcardSetID = uri.FlashcardSetID
 		err := h.useCase.UpdateCard(ctx, ctx.GetInt(appconst.KeyUserID), &card)
 		if err != nil {
 			if serr, ok := err.(*apperror.Error); ok {

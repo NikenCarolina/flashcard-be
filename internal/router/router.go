@@ -29,6 +29,8 @@ func Init(opts *handler.HandlerOpts, config *config.Config) http.Handler {
 	r.PUT("/sets/:set_id/cards/:card_id", authMiddleware.IsAuthenticated(), opts.UserHandler.UpdateCard)
 	r.PUT("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.BulkUpdateCard)
 	r.DELETE("/sets/:set_id/cards/:card_id", authMiddleware.IsAuthenticated(), opts.UserHandler.DeleteCard)
+	r.POST("/sessions", authMiddleware.IsAuthenticated(), opts.UserHandler.StartSession)
+	r.PUT("/sessions/:session_id", authMiddleware.IsAuthenticated(), opts.UserHandler.EndSession)
 
 	return r
 }
