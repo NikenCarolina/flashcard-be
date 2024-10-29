@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/NikenCarolina/flashcard-be/internal/appconst"
@@ -43,6 +44,7 @@ func (h *UserHandler) GetSetById(ctx *gin.Context) {
 }
 
 func (h *UserHandler) CreateSet(ctx *gin.Context) {
+	log.Println(ctx.GetInt(appconst.KeyUserID))
 	data, err := h.useCase.CreateSet(ctx, ctx.GetInt(appconst.KeyUserID))
 	if err != nil {
 		ctx.Error(err)

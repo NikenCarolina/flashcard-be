@@ -21,6 +21,7 @@ type Store interface {
 	Session() SessionRepository
 	SessionFlashcard() SessionFlashcardRepository
 	FlashcardProgress() FlashcardProgressRepository
+	User() UserRepository
 }
 
 type store struct {
@@ -82,4 +83,8 @@ func (s *store) SessionFlashcard() SessionFlashcardRepository {
 
 func (s *store) FlashcardProgress() FlashcardProgressRepository {
 	return NewFlashcardProgressRepository(s.db)
+}
+
+func (s *store) User() UserRepository {
+	return NewUserRepository(s.db)
 }

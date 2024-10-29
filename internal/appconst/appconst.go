@@ -13,4 +13,8 @@ var (
 	MsgGetSetOk       = "Successfully get set"
 	MsgEndSessionOk   = "Successfully end session"
 	MsgStartSessionOk = "Successfully start session"
+	MsgRegisterOk     = "Successfully registered"
+	MsgLoginOk        = "Successfully logged in"
+	MsgLogoutOk       = "Successfully logged out"
+	MsgGetProfileOk   = "Successfully get profile"
 )

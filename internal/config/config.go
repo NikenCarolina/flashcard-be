@@ -16,9 +16,13 @@ type Config struct {
 	Database  *DatabaseConfig
 	Cors      *cors.Config
 	Flashcard *FlashcardConfig
+	Jwt       *JwtConfig
+	Bycrypt   *BycryptConfig
 }
 
 type AppConfig struct {
+	AuthRedirectURL   string
+	DomainName        string
 	ServerAddress     string
 	ServerGracePeriod time.Duration
 }
@@ -37,6 +41,17 @@ type FlashcardConfig struct {
 	Interval         int64
 }
 
+type JwtConfig struct {
+	Issuer         string
+	SecretKey      string
+	AllowedAlgs    []string
+	ExpireDuration time.Duration
+}
+
+type BycryptConfig struct {
+	Cost int
+}
+
 func InitConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
@@ -47,6 +62,8 @@ func InitConfig() *Config {
 		Database:  InitDatabaseConfig(),
 		Cors:      InitCorsConfig(),
 		Flashcard: InitFlashcardConfig(),
+		Jwt:       InitJwtConfig(),
+		Bycrypt:   InitBycryptConfig(),
 	}
 }
 
@@ -56,6 +73,8 @@ func InitAppConfig() *AppConfig {
 		log.Fatal("failed to parse SERVER_GRACE_PERIOD")
 	}
 	return &AppConfig{
+		DomainName:        os.Getenv("DOMAIN_NAME"),
+		AuthRedirectURL:   os.Getenv("AUTH_REDIRECT_URL"),
 		ServerAddress:     os.Getenv("SERVER_PORT"),
 		ServerGracePeriod: gracePeriod,
 	}
@@ -78,9 +97,17 @@ func InitDatabaseConfig() *DatabaseConfig {
 }
 
 func InitCorsConfig() *cors.Config {
+
+	allowCredentials, err := strconv.ParseBool(os.Getenv("CORS_ALLOW_CREDENTIALS"))
+	if err != nil {
+		log.Fatal("failed to parse CORS_ALLOW_CREDENTIALS")
+	}
+
 	return &cors.Config{
-		AllowOrigins: []string{os.Getenv("FRONTEND_URL")},
-		AllowMethods: strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), " "),
+		AllowOrigins:     strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ","),
+		AllowMethods:     strings.Split(os.Getenv("CORS_ALLOW_METHODS"), ","),
+		AllowHeaders:     strings.Split(os.Getenv("CORS_ALLOW_HEADERS"), ","),
+		AllowCredentials: allowCredentials,
 	}
 }
 
@@ -104,5 +131,30 @@ func InitFlashcardConfig() *FlashcardConfig {
 		RepetitionNumber: repetitionNumber,
 		EasinessFactor:   easinessFactor,
 		Interval:         interval,
+	}
+}
+
+func InitJwtConfig() *JwtConfig {
+	expireDuration, err := time.ParseDuration(os.Getenv("JWT_EXPIRE_DURATION"))
+	if err != nil {
+		log.Fatal("failed to parse JWT_EXPIRE_DURATION")
+	}
+
+	return &JwtConfig{
+		Issuer:         os.Getenv("JWT_ISSUER"),
+		SecretKey:      os.Getenv("JWT_SECRET_KEY"),
+		AllowedAlgs:    strings.Split(os.Getenv("JWT_ALLOWED_ALGOS"), ", "),
+		ExpireDuration: expireDuration,
+	}
+}
+
+func InitBycryptConfig() *BycryptConfig {
+	cost, err := strconv.ParseInt(os.Getenv("BCRYPT_COST"), 10, 64)
+	if err != nil {
+		log.Fatal("failed to parse INTERVAL")
+	}
+
+	return &BycryptConfig{
+		Cost: int(cost),
 	}
 }
