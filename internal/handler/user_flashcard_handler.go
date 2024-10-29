@@ -42,6 +42,62 @@ func (h *UserHandler) GetSetById(ctx *gin.Context) {
 	})
 }
 
+func (h *UserHandler) CreateSet(ctx *gin.Context) {
+	data, err := h.useCase.CreateSet(ctx, ctx.GetInt(appconst.KeyUserID))
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, dto.Response{
+		Message: appconst.MsgCreateSetOk,
+		Data:    data,
+	})
+}
+
+func (h *UserHandler) UpdateSet(ctx *gin.Context) {
+	var uri dto.FlashcardSetUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.Error(apperror.ErrBadRequest)
+		return
+	}
+
+	var req dto.FlashcardSet
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.Error(err)
+		return
+	}
+	req.FlashcardSetID = uri.FlashcardSetID
+
+	err := h.useCase.UpdateSet(ctx, ctx.GetInt(appconst.KeyUserID), &req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, dto.Response{
+		Message: appconst.MsgUpdateSetOk,
+	})
+}
+
+func (h *UserHandler) DeleteSet(ctx *gin.Context) {
+	var uri dto.FlashcardSetUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	err := h.useCase.DeleteSet(ctx, ctx.GetInt(appconst.KeyUserID), int(uri.FlashcardSetID))
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Message: appconst.MsgDeleteSetOk,
+	})
+}
+
 func (h *UserHandler) ListCards(ctx *gin.Context) {
 	var uri dto.FlashcardSetUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {

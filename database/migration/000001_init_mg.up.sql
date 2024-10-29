@@ -51,12 +51,12 @@ CREATE TABLE "session_flashcards" (
     "review_time" TIMESTAMP
 );
 
-ALTER TABLE "session_flashcards" ADD FOREIGN KEY ("session_id") REFERENCES "sessions" ("session_id");
+ALTER TABLE "session_flashcards" ADD FOREIGN KEY ("session_id") REFERENCES "sessions" ("session_id") ON DELETE CASCADE;
 
-ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE CASCADE;
 
-ALTER TABLE "flashcard_progress" ADD FOREIGN KEY ("flashcard_id") REFERENCES "flashcards" ("flashcard_id");
+ALTER TABLE "flashcard_progress" ADD FOREIGN KEY ("flashcard_id") REFERENCES "flashcards" ("flashcard_id") ON DELETE CASCADE;
 
-ALTER TABLE "flashcards" ADD FOREIGN KEY ("flashcard_set_id") REFERENCES "flashcard_sets" ("flashcard_set_id");
+ALTER TABLE "flashcards" ADD FOREIGN KEY ("flashcard_set_id") REFERENCES "flashcard_sets" ("flashcard_set_id") ON DELETE CASCADE;
 
 ALTER TABLE "flashcard_sets" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");

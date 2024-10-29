@@ -23,6 +23,9 @@ func Init(opts *handler.HandlerOpts, config *config.Config) http.Handler {
 	authMiddleware := middleware.NewAuthMiddleware()
 
 	r.GET("/sets", authMiddleware.IsAuthenticated(), opts.UserHandler.ListSets)
+	r.POST("/sets", authMiddleware.IsAuthenticated(), opts.UserHandler.CreateSet)
+	r.PUT("/sets/:set_id", authMiddleware.IsAuthenticated(), opts.UserHandler.UpdateSet)
+	r.DELETE("/sets/:set_id", authMiddleware.IsAuthenticated(), opts.UserHandler.DeleteSet)
 	r.GET("/sets/:set_id", authMiddleware.IsAuthenticated(), opts.UserHandler.GetSetById)
 	r.GET("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.ListCards)
 	r.POST("/sets/:set_id/cards", authMiddleware.IsAuthenticated(), opts.UserHandler.CreateCard)
