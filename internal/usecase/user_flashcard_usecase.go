@@ -81,7 +81,7 @@ func (u *userUseCase) CreateSet(ctx context.Context, userID int) (*dto.Flashcard
 
 func (u *userUseCase) CreateCard(ctx context.Context, userID int, setID int) (*dto.Flashcard, error) {
 	res, err := u.store.Atomic(ctx, func(s repository.Store) (any, error) {
-		flashcardSetRepo := u.store.FlashcardSet()
+		flashcardSetRepo := s.FlashcardSet()
 		exists, err := flashcardSetRepo.CheckExists(ctx, userID, setID)
 		if err != nil {
 			return nil, err
@@ -90,13 +90,13 @@ func (u *userUseCase) CreateCard(ctx context.Context, userID int, setID int) (*d
 			return nil, apperror.ErrNotFound
 		}
 
-		flashcardRepo := u.store.Flashcard()
+		flashcardRepo := s.Flashcard()
 		res, err := flashcardRepo.Create(ctx, setID)
 		if err != nil {
 			return nil, err
 		}
 
-		progressRepo := u.store.FlashcardProgress()
+		progressRepo := s.FlashcardProgress()
 		err = progressRepo.Create(ctx,
 			setID,
 			res.FlashcardID,
