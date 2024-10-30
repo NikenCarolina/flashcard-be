@@ -18,12 +18,11 @@ VALUES
   (3, 'Algorithm', 'A step-by-step procedure for solving a problem.', NOW(), NOW()),
   (3, 'Data Structure', 'A way of organizing data in a computer.', NOW(), NOW());
 
-INSERT INTO "flashcard_progress" ("flashcard_id", "last_review", "repetition_number", "easiness_factor", "interval")
+INSERT INTO "flashcard_progress" ("flashcard_id", "flashcard_set_id", "repetition_number", "easiness_factor", "interval", "last_review", "due_date")
 VALUES 
-  (1, NOW(), 0, 2.5, 1),
-  (2, NOW(), 0, 2.5, 1),
-  (3, NOW(), 0, 2.5, 1),
-  (4, NOW(), 0, 2.5, 1),
-  (5, NOW(), 0, 2.5, 1),
-  (6, NOW(), 0, 2.5, 1);
-
+  (1, 1, 0, 2.5, 1, NOW() - INTERVAL '2 DAYS', NOW() + INTERVAL '1 DAY'), 
+  (2, 1, 1, 2.5, 3, NOW() - INTERVAL '1 DAY', NOW() + INTERVAL '2 DAYS'), 
+  (3, 2, 0, 2.5, 1, NOW() - INTERVAL '4 DAYS', NOW() + INTERVAL '1 DAY'), 
+  (4, 2, 1, 2.5, 2, NOW() - INTERVAL '2 DAYS', NOW() + INTERVAL '3 DAYS'), 
+  (5, 3, 0, 2.5, 1, NOW() - INTERVAL '3 DAYS', NOW() + INTERVAL '1 DAY'), 
+  (6, 3, 2, 2.5, 5, NOW() - INTERVAL '1 DAY', NOW() + INTERVAL '6 DAYS'); 
